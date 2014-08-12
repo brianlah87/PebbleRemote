@@ -861,8 +861,7 @@ static void savePersistentSettings() {
 
 //button handlers
 
-static void handleMessageFailure(DictionaryIterator *iterator, AppMessageResult reason, void *context)
-{
+static void handleMessageFailure(DictionaryIterator *iterator, AppMessageResult reason, void *context) {
 	text_layer_set_text(tiny_message_box, "FAILED");
 }
 
@@ -874,7 +873,6 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 	dict_write_end(iter);
   app_message_outbox_send();
-  app_message_register_outbox_failed((AppMessageOutboxFailed)handleMessageFailure);
   
 	text_layer_set_text(tiny_message_box, "LTTTNTNN1T");
   resetDisplayTimer = app_timer_register(1000, (AppTimerCallback) resetDisplayTimerCallback, NULL);
@@ -888,7 +886,6 @@ static void up_hold_handler(ClickRecognizerRef recognizer, void *context) {
 
 	dict_write_end(iter);
   app_message_outbox_send();
-  app_message_register_outbox_failed((AppMessageOutboxFailed)handleMessageFailure);
   
 	text_layer_set_text(tiny_message_box, "L000N0NN1T");
   resetDisplayTimer = app_timer_register(1000, (AppTimerCallback) resetDisplayTimerCallback, NULL);
@@ -902,7 +899,6 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 	dict_write_end(iter);
   app_message_outbox_send();
-  app_message_register_outbox_failed((AppMessageOutboxFailed)handleMessageFailure);
   
 	text_layer_set_text(tiny_message_box, "LNNNNNN5NT");
   resetDisplayTimer = app_timer_register(1000, (AppTimerCallback) resetDisplayTimerCallback, NULL);
@@ -916,7 +912,6 @@ static void select_hold_handler(ClickRecognizerRef recognizer, void *context) {
 
 	dict_write_end(iter);
   app_message_outbox_send();
-  app_message_register_outbox_failed((AppMessageOutboxFailed)handleMessageFailure);
   
 	text_layer_set_text(tiny_message_box, "L00010NN1TA000HC170C");
   resetDisplayTimer = app_timer_register(1000, (AppTimerCallback) resetDisplayTimerCallback, NULL);
@@ -930,7 +925,6 @@ static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 	dict_write_end(iter);
   app_message_outbox_send();
-  app_message_register_outbox_failed((AppMessageOutboxFailed)handleMessageFailure);
   
 	text_layer_set_text(tiny_message_box, "LNNNTNNNNTAT00HC170C");
   resetDisplayTimer = app_timer_register(1000, (AppTimerCallback) resetDisplayTimerCallback, NULL);
@@ -943,7 +937,6 @@ static void down_hold_handler(ClickRecognizerRef recognizer, void *context) {
 
 	dict_write_end(iter);
   app_message_outbox_send();
-  app_message_register_outbox_failed((AppMessageOutboxFailed)handleMessageFailure);
   
 	text_layer_set_text(tiny_message_box, "LNNN1NNNNTA000HC170C");
   resetDisplayTimer = app_timer_register(1000, (AppTimerCallback) resetDisplayTimerCallback, NULL);

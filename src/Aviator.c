@@ -329,8 +329,10 @@ void change_background() {
     
 }
 
+//BRIAN GOT RID OF MINUTE HAND
+
 static void toggleHands(bool hidden) {
-	layer_set_hidden((Layer *)minuteHandLayer, hidden);
+	//layer_set_hidden((Layer *)minuteHandLayer, true);
 	layer_set_hidden((Layer *)hourHandLayer, hidden);
 } 
 
@@ -606,22 +608,25 @@ static void update_seconds(struct tm *tick_time) {
 	}
 }
 
+//brian disabled minute hand
 static void update_hands(struct tm *t) {
 	GRect r;
-	int32_t minuteAngle = t->tm_min * TRIG_MAX_ANGLE / 60;
+	//int32_t minuteAngle = t->tm_min * TRIG_MAX_ANGLE / 60;
 	int32_t hourAngle = ((t->tm_hour%12)*60 + t->tm_min) * TRIG_MAX_ANGLE / 720;
 
+  /*
 	r = layer_get_frame((Layer *)minuteHandLayer);
 	r.origin.x = 72 - r.size.w/2 + 57 * cos_lookup((minuteAngle + 3 * TRIG_MAX_ANGLE / 4)%TRIG_MAX_ANGLE) / TRIG_MAX_RATIO;
 	r.origin.y = 84 - r.size.h/2 + 57 * sin_lookup((minuteAngle + 3 * TRIG_MAX_ANGLE / 4)%TRIG_MAX_ANGLE) / TRIG_MAX_RATIO;
 	layer_set_frame((Layer *)minuteHandLayer, r);
 	rot_bitmap_layer_set_angle(minuteHandLayer, minuteAngle);
-	
+	*/
+  
 	r = layer_get_frame((Layer *)hourHandLayer);
-	r.origin.x = 72 - r.size.w/2 + 58 * cos_lookup((hourAngle + 3 * TRIG_MAX_ANGLE / 4)%TRIG_MAX_ANGLE) / TRIG_MAX_RATIO;
-	r.origin.y = 84 - r.size.h/2 + 58 * sin_lookup((hourAngle + 3 * TRIG_MAX_ANGLE / 4)%TRIG_MAX_ANGLE) / TRIG_MAX_RATIO;
+	r.origin.x = 72 - r.size.w/2 + 60 * cos_lookup((hourAngle + 3 * TRIG_MAX_ANGLE / 4)%TRIG_MAX_ANGLE) / TRIG_MAX_RATIO;
+	r.origin.y = 84 - r.size.h/2 + 60 * sin_lookup((hourAngle + 3 * TRIG_MAX_ANGLE / 4)%TRIG_MAX_ANGLE) / TRIG_MAX_RATIO;
 	layer_set_frame((Layer *)hourHandLayer, r);
-	rot_bitmap_layer_set_angle(hourHandLayer, hourAngle);
+	//rot_bitmap_layer_set_angle(hourHandLayer, hourAngle);
 }
 
 static void update_zulu_hours(struct tm *tick_time) {
@@ -1184,14 +1189,15 @@ static void init(void) {
     text_layer_set_text_alignment(tiny_message_box, GTextAlignmentCenter);
     layer_add_child(bottom_layer, text_layer_get_layer(tiny_message_box));
 
+  //BRIAN GOT RID OF MINUTE HAND
     // MINUTE HAND
-	minuteHandBitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_HAND_MINUTE);
+	//minuteHandBitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_HAND_MINUTE);
 	/*if (minuteHandBitmap == NULL) {
 		APP_LOG(APP_LOG_LEVEL_DEBUG, "init() - gbitmap_create Failed for minuteHandBitmap");
 	}*/	
-	minuteHandLayer = rot_bitmap_layer_create(minuteHandBitmap);
-	rot_bitmap_set_compositing_mode(minuteHandLayer, GCompOpOr);
-	layer_add_child(window_layer, (Layer *)minuteHandLayer);
+	//minuteHandLayer = rot_bitmap_layer_create(minuteHandBitmap);
+	//rot_bitmap_set_compositing_mode(minuteHandLayer, GCompOpOr);
+	//layer_add_child(window_layer, (Layer *)minuteHandLayer);
 
     // HOUR HAND
 	hourHandBitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_HAND_HOUR);
@@ -1276,7 +1282,9 @@ static void deinit(void) {
 /*
   fonts_unload_custom_font(tiny_font);
 */
-	rot_bitmap_layer_destroy(minuteHandLayer);
+  
+  //BRIAN GOT RID OF MINUTE HAND
+	//rot_bitmap_layer_destroy(minuteHandLayer);
 	rot_bitmap_layer_destroy(hourHandLayer);
 
 	gbitmap_destroy(minuteHandBitmap);

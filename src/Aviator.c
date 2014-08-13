@@ -524,7 +524,6 @@ static void update_days(struct tm *tick_time) {
 		  strncpy(dayString, "SATURDAY", sizeof(dayString));
       break;
   }
-  text_layer_set_text(tiny_message_box, dayString);
 }
 
 static void update_hours(struct tm *tick_time) {
@@ -737,6 +736,7 @@ static void handle_tick(struct tm *tick_time, TimeUnits units_changed) {
     }
     
     if ((units_changed & SECOND_UNIT) && (settings.Seconds == 1)) {
+        update_seconds(tick_time);
         if (settings.Style == 2) {
 			    update_zulu_seconds(&zulu_tick_time);
         }
@@ -763,7 +763,6 @@ static void sync_tuple_changed_callback(const uint32_t key, const Tuple * new_tu
 			break;
 			
 		case INVERT_KEY:
-	    text_layer_set_text(tiny_message_box, "OK");
 			settings.Invert = new_tuple->value->uint8;
 			if (settings.Invert) {
 				set_invert();
@@ -862,7 +861,8 @@ static void savePersistentSettings() {
 //button handlers
 
 static void handleMessageFailure(DictionaryIterator *iterator, AppMessageResult reason, void *context) {
-	text_layer_set_text(tiny_message_box, "FAILED");
+  vibes_long_pulse();
+	text_layer_set_text(tiny_message_box, "APP OFFLINE");
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -874,8 +874,10 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 	dict_write_end(iter);
   app_message_outbox_send();
   
-	text_layer_set_text(tiny_message_box, "LTTTNTNN1T");
+	text_layer_set_text(tiny_message_box, "LIGHTS TOGGLE");
   resetDisplayTimer = app_timer_register(1000, (AppTimerCallback) resetDisplayTimerCallback, NULL);
+  
+  app_message_register_outbox_failed(handleMessageFailure);
 }
 
 static void up_hold_handler(ClickRecognizerRef recognizer, void *context) {
@@ -887,8 +889,10 @@ static void up_hold_handler(ClickRecognizerRef recognizer, void *context) {
 	dict_write_end(iter);
   app_message_outbox_send();
   
-	text_layer_set_text(tiny_message_box, "L000N0NN1T");
+	text_layer_set_text(tiny_message_box, "LIGHTS OFF");
   resetDisplayTimer = app_timer_register(1000, (AppTimerCallback) resetDisplayTimerCallback, NULL);
+
+  app_message_register_outbox_failed(handleMessageFailure);
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -900,9 +904,10 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 	dict_write_end(iter);
   app_message_outbox_send();
   
-	text_layer_set_text(tiny_message_box, "LNNNNNN5NT");
+	text_layer_set_text(tiny_message_box, "DOOR");
   resetDisplayTimer = app_timer_register(1000, (AppTimerCallback) resetDisplayTimerCallback, NULL);
   
+  app_message_register_outbox_failed(handleMessageFailure);
 }
 static void select_hold_handler(ClickRecognizerRef recognizer, void *context) {
   DictionaryIterator *iter;
@@ -913,8 +918,10 @@ static void select_hold_handler(ClickRecognizerRef recognizer, void *context) {
 	dict_write_end(iter);
   app_message_outbox_send();
   
-	text_layer_set_text(tiny_message_box, "L00010NN1TA000HC170C");
+	text_layer_set_text(tiny_message_box, "ALL OFF");
   resetDisplayTimer = app_timer_register(1000, (AppTimerCallback) resetDisplayTimerCallback, NULL);
+  
+  app_message_register_outbox_failed(handleMessageFailure);
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -926,8 +933,10 @@ static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
 	dict_write_end(iter);
   app_message_outbox_send();
   
-	text_layer_set_text(tiny_message_box, "LNNNTNNNNTAT00HC170C");
+	text_layer_set_text(tiny_message_box, "AC TOGGLE");
   resetDisplayTimer = app_timer_register(1000, (AppTimerCallback) resetDisplayTimerCallback, NULL);
+  
+  app_message_register_outbox_failed(handleMessageFailure);
 }
 static void down_hold_handler(ClickRecognizerRef recognizer, void *context) {
   DictionaryIterator *iter;
@@ -938,8 +947,25 @@ static void down_hold_handler(ClickRecognizerRef recognizer, void *context) {
 	dict_write_end(iter);
   app_message_outbox_send();
   
-	text_layer_set_text(tiny_message_box, "LNNN1NNNNTA000HC170C");
+	text_layer_set_text(tiny_message_box, "AC OFF");
   resetDisplayTimer = app_timer_register(1000, (AppTimerCallback) resetDisplayTimerCallback, NULL);
+  
+  app_message_register_outbox_failed(handleMessageFailure);
+}
+
+static void down_doubleclick_handler(ClickRecognizerRef recognizer, void *context) {
+  DictionaryIterator *iter;
+	
+	app_message_outbox_begin(&iter);
+	dict_write_cstring(iter, 10, "http://home.brianlah.com:1338/?c=LNNN0NNNNTA100HC171C");  //key 10 is automationCommand
+
+	dict_write_end(iter);
+  app_message_outbox_send();
+  
+	text_layer_set_text(tiny_message_box, "AC 1 HOUR");
+  resetDisplayTimer = app_timer_register(1000, (AppTimerCallback) resetDisplayTimerCallback, NULL);
+  
+  app_message_register_outbox_failed(handleMessageFailure);
 }
 
 static void click_config_provider(void *context) {
@@ -950,6 +976,8 @@ static void click_config_provider(void *context) {
   window_long_click_subscribe(BUTTON_ID_UP, 0, up_hold_handler, NULL);
   window_long_click_subscribe(BUTTON_ID_SELECT, 0, select_hold_handler, NULL);
   window_long_click_subscribe(BUTTON_ID_DOWN, 0, down_hold_handler, NULL);
+  
+  window_multi_click_subscribe(BUTTON_ID_DOWN, 2, 2, 0, true, down_doubleclick_handler);
 }
 
 static void init(void) {
@@ -1182,6 +1210,8 @@ static void init(void) {
 
     mAppStarted = true;
 
+    text_layer_set_text(tiny_message_box, dayString);
+  
     tick_timer_service_subscribe(SECOND_UNIT, handle_tick);
     battery_state_service_subscribe(update_battery);
     bluetooth_connection_service_subscribe(bluetooth_connection_callback);
